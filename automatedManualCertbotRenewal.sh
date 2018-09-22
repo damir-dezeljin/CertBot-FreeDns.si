@@ -7,4 +7,14 @@
 # the generic `/path/to/...` and `DOMAIN.COM`, which should be replaced with 
 # your script location and domain respectively.
 
-certbot --dry-run certonly --agree-tos --manual-public-ip-logging-ok --renew-by-default --manual --preferred-challenges=dns --manual-auth-hook /path/to/certbotFreeDNSAuthHook.sh --manual-cleanup-hook /path/to/certbotFreeDNSCleanupHook.sh -d "*.DOMAIN.COM" --server https://acme-v02.api.letsencrypt.org/directory
+certbot certonly                                                    \
+	--dry-run                                                   \
+	--agree-tos                                                 \
+	--manual-public-ip-logging-ok                               \
+	--renew-by-default                                          \
+	--manual                                                    \
+	--preferred-challenges=dns                                  \
+	--manual-auth-hook /path/to/certbotFreeDNSAuthHook.sh       \
+	--manual-cleanup-hook /path/to/certbotFreeDNSCleanupHook.sh \
+	-d "*.DOMAIN.COM"                                           \
+	--server https://acme-v02.api.letsencrypt.org/directory

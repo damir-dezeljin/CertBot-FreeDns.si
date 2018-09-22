@@ -13,25 +13,46 @@ WORKINGDIR="/tmp/CERTBOT_$CERTBOT_DOMAIN"
 COOKIEFILE="$WORKINGDIR/cookies.tmp"
 TXTID_FILE="$WORKINGDIR/TXT_ID"
 
+REGEX_DOMAINID="s/.*$CERTBOT_DOMAIN.*domain_id=\\([0-9]*\\).*/\\1/;t;d"
+REGEX_TXTID="s/.*data_id=\\([0-9]*\\)>_acme-challenge.*/\\1/;t;d"
+
 if [ ! -d $WORKINGDIR ]; then
 	mkdir -m 0700 $WORKINGDIR
 fi
 
 echo "==============================================="
 echo "Logging in..."
-curl -s "https://freedns.afraid.org/zc.php?step=2 " -c $COOKIEFILE -d "action=auth" -d "submit=Login" -d "username=$USERNAME" -d "password=$PASSWORD"
+curl -s "https://freedns.afraid.org/zc.php?step=2 " \
+     -c $COOKIEFILE                                 \
+     -d "action=auth"                               \
+     -d "submit=Login"                              \
+     -d "username=$USERNAME"                        \
+     -d "password=$PASSWORD"
 
 echo "Getting domain ID..."
-DOM_ID=$(curl -s "https://freedns.afraid.org/subdomain/" -b $COOKIEFILE | sed --posix "s/.*$CERTBOT_DOMAIN.*domain_id=\\([0-9]*\\).*/\\1/;t;d")
+DOM_ID=$(curl -s "https://freedns.afraid.org/subdomain/" \
+              -b $COOKIEFILE                             \
+	      | sed --posix $REGEX_DOMAINID)
 echo "Domain ID: $DOM_ID"
 
 echo "Getting current TXT record ID (if existent)..."
-TXT_ID=$(curl -s "https://freedns.afraid.org/subdomain/" -b $COOKIEFILE | sed --posix 's/.*data_id=\([0-9]*\)>_acme-challenge.*/\1/;t;d')
+TXT_ID=$(curl -s "https://freedns.afraid.org/subdomain/" \
+              -b $COOKIEFILE                             \
+	      | sed --posix $REGEX_TXTID)
 
 echo "Creating/Updaing TXT record..."
-curl -s "https://freedns.afraid.org/subdomain/save.php?step=2" -b $COOKIEFILE -d "type=TXT" -d "subdomain=_acme-challenge" -d "domain_id=$DOM_ID" -d "address=%22$CERTBOT_VALIDATION%22" -d "data_id=$TXT_ID" -d "send=Save%21"
+curl -s "https://freedns.afraid.org/subdomain/save.php?step=2" \
+     -b $COOKIEFILE                                            \
+     -d "type=TXT"                                             \
+     -d "subdomain=_acme-challenge"                            \
+     -d "domain_id=$DOM_ID"                                    \
+     -d "address=%22$CERTBOT_VALIDATION%22"                    \
+     -d "data_id=$TXT_ID"                                      \
+     -d "send=Save%21"
 
-TXT_ID=$(curl -s "https://freedns.afraid.org/subdomain/" -b $COOKIEFILE | sed --posix 's/.*data_id=\([0-9]*\)>_acme-challenge.*/\1/;t;d')
+TXT_ID=$(curl -s "https://freedns.afraid.org/subdomain/" \
+              -b $COOKIEFILE                             \
+	      | sed --posix $REGEX_TXTID)
 echo "TXT record ID: $TXT_ID"
 echo Saving ID for cleanup...
 echo $TXT_ID > $TXTID_FILE

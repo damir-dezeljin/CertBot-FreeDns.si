@@ -9,7 +9,6 @@
 USERNAME='user%40domain.com'  # Username for FreeDNS
 PASSWORD='verysecurepassword' # Password for FreeDNS
 
-# Ok, stop modifying now :P
 WORKINGDIR="/tmp/CERTBOT_$CERTBOT_DOMAIN"
 COOKIEFILE="$WORKINGDIR/cookies.tmp"
 TXTID_FILE="$WORKINGDIR/TXT_ID"
@@ -18,13 +17,21 @@ echo "==============================================="
 echo "Cleaning up..."
 if [ ! -f $COOKIESFILE ]; then
 	echo "No saved cookies found... Logging in..."
-	curl -s "https://freedns.afraid.org/zc.php?step=2 " -c $COOKIEFILE -d "action=auth" -d "submit=Login" -d "username=$USERNAME" -d "password=$PASSWORD"
+	curl -s "https://freedns.afraid.org/zc.php?step=2 " \
+	     -c $COOKIEFILE                                 \
+	     -d "action=auth"                               \
+	     -d "submit=Login"                              \
+	     -d "username=$USERNAME"                        \
+	     -d "password=$PASSWORD"
 fi
 
 if [ -f $TXTID_FILE ]; then
 	TXT_ID=$(cat $TXTID_FILE)
 	echo "Deleting TXT record ID ($TXT_ID)..."
-	curl -s "https://freedns.afraid.org/subdomain/delete2.php?data_id%5B%5D=$TXT_ID&submit=delete+selected" -b $COOKIEFILE
+	QUERY="https://freedns.afraid.org/subdomain/delete2.php?"
+	QUERY+="data_id%5B%5D=$TXT_ID&"
+	QUERY+="submit=delete+selected"
+	curl -s $QUERY -b $COOKIEFILE
 fi
 
 rm -vrf $WORKINGDIR
