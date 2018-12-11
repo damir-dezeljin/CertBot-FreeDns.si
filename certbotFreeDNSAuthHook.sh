@@ -16,12 +16,12 @@ TXTID_FILE="$WORKINGDIR/TXT_ID"
 REGEX_DOMAINID="s/.*$CERTBOT_DOMAIN.*domain_id=\\([0-9]*\\).*/\\1/;t;d"
 REGEX_TXTID="s/.*data_id=\\([0-9]*\\)>_acme-challenge.*/\\1/;t;d"
 
+echo "==============================================="
 if [ ! -d $WORKINGDIR ]; then
 	echo "Creating working director for temporary files ($WORKINGDIR)"
 	mkdir -m 0700 $WORKINGDIR
 fi
 
-echo "==============================================="
 echo "Logging in..."
 curl -s "https://freedns.afraid.org/zc.php?step=2 " \
      -c $COOKIEFILE                                 \
