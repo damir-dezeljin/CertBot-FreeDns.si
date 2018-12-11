@@ -17,6 +17,7 @@ REGEX_DOMAINID="s/.*$CERTBOT_DOMAIN.*domain_id=\\([0-9]*\\).*/\\1/;t;d"
 REGEX_TXTID="s/.*data_id=\\([0-9]*\\)>_acme-challenge.*/\\1/;t;d"
 
 if [ ! -d $WORKINGDIR ]; then
+	echo "Creating working director for temporary files ($WORKINGDIR)"
 	mkdir -m 0700 $WORKINGDIR
 fi
 
@@ -57,6 +58,6 @@ echo "TXT record ID: $TXT_ID"
 echo Saving ID for cleanup...
 echo $TXT_ID > $TXTID_FILE
 
-echo Auth Step DONE, Sleeping to allow for DNS records to proporgate
+echo "Auth Step DONE, Sleeping to allow for DNS records to propagate"
 sleep 15
 echo "==============================================="
