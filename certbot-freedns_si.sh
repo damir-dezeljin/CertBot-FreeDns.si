@@ -211,7 +211,7 @@ sleep 0.5
 case "${OP}" in
 auth)
   CreateTxtRecord "${COOKIEFILE}" "${DOM_ID}" "${RECORD_ID}" "${ACME_NAME_PREFIX}${HOSTNAME_SUFFIX}" "${CERTBOT_VALIDATION}"
-  sleep 1
+  sleep 15
   ;;
 cleanup)
   DeleteTxtRecord "${COOKIEFILE}" "${DOM_ID}" "${RECORD_ID}"
