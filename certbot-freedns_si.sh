@@ -197,6 +197,15 @@ fi
 
 echo "==============================================="
 
+cat <<_EOF_
+
+Setting up Let's Encrypt ACME verification for:
+ - domain:    ${CERTBOT_DOMAIN}
+ - challenge: ${CERTBOT_VALIDATION}
+----
+
+_EOF_
+
 ApiLogin "${COOKIEFILE}"
 sleep 0.5
 
@@ -204,14 +213,25 @@ FetchDomainId "DOM_ID" "${COOKIEFILE}" "${DOMAIN}"
 echo "  DONE - domain ID for '${DOMAIN}': '${DOM_ID}'"
 sleep 0.5
 
-FindTxtRecordId "RECORD_ID" "${COOKIEFILE}" "${DOM_ID}" "${ACME_NAME_PREFIX}${HOSTNAME_SUFFIX}"
-echo "  DONE - record ID for '${ACME_NAME_PREFIX}${HOSTNAME_SUFFIX}': '${RECORD_ID}'"
-sleep 0.5
+#NUM_DOMAINS=$(echo "${CERTBOT_ALL_DOMAINS}" | tr , "\n" | wc -l | tr -d " ")
+#if [ "${NUM_DOMAINS}" -gt 1 ]; then
+#  echo "Skip deleting old record - number of domains is greater than 1 (${NUM_DOMAINS}) ..."
+#else
+#  RECORD_ID="0"
+#  while [ ! -z "${RECORD_ID}" ]; do
+#    break
+#    FindTxtRecordId "RECORD_ID" "${COOKIEFILE}" "${DOM_ID}" "${ACME_NAME_PREFIX}${HOSTNAME_SUFFIX}"
+#    echo "  DONE - record ID for '${ACME_NAME_PREFIX}${HOSTNAME_SUFFIX}': '${RECORD_ID}'"
+#    sleep 0.5
+#  done
+#fi
 
 case "${OP}" in
 auth)
   CreateTxtRecord "${COOKIEFILE}" "${DOM_ID}" "${RECORD_ID}" "${ACME_NAME_PREFIX}${HOSTNAME_SUFFIX}" "${CERTBOT_VALIDATION}"
-  sleep 15
+#  if [ "${CERTBOT_REMAINING_CHALLENGES}" -eq 0 ]; then
+    sleep 15
+#  fi
   ;;
 cleanup)
   DeleteTxtRecord "${COOKIEFILE}" "${DOM_ID}" "${RECORD_ID}"
